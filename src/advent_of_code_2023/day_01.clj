@@ -40,4 +40,30 @@
   (let [value (numbers (keyword s))]
     (if value value s)))
 
+(defn calibration-values-w-text [s]
+  (let [digits (->> (re-seq #"(\d|one|two|three|four|five|six|seven|eight|nine)" s)
+                    (map first))]
+    (->> (list (first digits) (last digits))
+         (map replace-text-numbers)
+         (str/join)
+         (#(Integer/parseInt %)))))
 
+; Accounting for overlapping characters e.g. oneight
+; because regex doesn't handle for some reason
+(defn preprocess-values [s]
+  (-> (str/replace s "one" "oneone")
+      (str/replace "two" "twotwo")
+      (str/replace "three" "threethree")
+      (str/replace "four" "fourfour")
+      (str/replace "five" "fivefive")
+      (str/replace "six" "sixsix")
+      (str/replace "seven" "sevenseven")
+      (str/replace "eight" "eighteight")
+      (str/replace "nine" "ninenine")))
+
+(defn part-2 [doc]
+  (->> (map preprocess-values doc)
+       (map calibration-values-w-text)
+       (reduce +)))
+
+(part-2 calibration-doc)
