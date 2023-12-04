@@ -38,7 +38,7 @@
     (filter #(adjacent-number? % symbols) numbers-two)))
 
 (defn part-1 [parts]
-  (->> (concat [""] engine-parts [""])
+  (->> (concat [""] parts [""])
        (partition 3 1)
        (map adjacent-line?)
        (flatten)
@@ -65,3 +65,21 @@
 (count (concat [""] engine-parts '("")))
 
 (part-1 engine-parts)
+
+(defn get-* [line]
+  (->> (re-seq-pos #"\*" line)))
+
+(defn adjacent-ratio [[line-one line-two line-three]]
+  (let [numbers-one (get-numbers line-one)
+        numbers-two (get-numbers line-two)
+        symbols-two (get-* line-two)
+        numbers-three (get-numbers line-three)]
+    ))
+
+(defn part-2 [parts]
+  (->> (concat [""] parts [""])
+       (partition 2 1)))
+
+(get-* "**e**")
+(map-indexed vector engine-parts)
+
