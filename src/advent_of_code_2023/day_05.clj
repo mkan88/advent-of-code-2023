@@ -33,7 +33,6 @@
     (+ (- seed source) destination)
     seed))
 
-
 (defn seed-remap [seed lines]
   (loop [l lines]
     (let [mapped (seed-remap-line seed (first l))]
@@ -44,14 +43,57 @@
 
 (defn part-1 [seeds maps]
   (->> (map (fn [s]
-         (loop [s s
-                maps maps]
-           (if (= 0 (count maps))
-             s
-             (recur (seed-remap s (first maps)) (rest maps))))) seeds)
+              (loop [s s
+                     maps maps]
+                (if (= 0 (count maps))
+                  s
+                  (recur (seed-remap s (first maps)) (rest maps))))) seeds)
        (apply min)))
 
 (seed-remap 104847962 (first maps))
 (seed-remap-line 104847962 (first (first maps)))
 (part-1 seeds maps)
-;; => 88151870
+
+(identity seeds)
+
+(def seeds2
+  (->> (partition 2 seeds)
+       (map (fn [[start rang]] (range start (+ start rang))))
+       (flatten)))
+
+(defn seed-remap-line-range [[seed-min seed-max] [destination source rang]]
+  (let [source-max (+ source rang)
+        remap-fn (fn [sd] (+ (- sd source) destination))]
+  (cond
+    (< seed-max source) '(seed-min seed-max)
+    (< source-max seed-min) '(seed-min seed-max)
+    (<= source seed-min seed-max source-max) '((remap-fn seed-min) (remap-fn seed-max))
+    (<= source seed-min source-max seed-max) '('((remap-fn seed-min) (remap-fn source-max))
+                                               '(source-max seed-min))
+    (<= seed-min source seed-max source-max) '('(seed-min (dec source)) '((remap-fn source) (remap-fn seed-max))))))
+
+(defn seed-remap-range [seed lines]
+  (loop [l lines]
+    (let [mapped (seed-remap-line-range seed (first l))]
+      (cond
+        (not= seed mapped) mapped
+        (= (count l) 1) seed
+        :else (recur (rest l))))))
+
+(defn part-2 [seeds maps]
+  (->> (pmap (fn [s]
+              (loop [s s
+                     maps maps]
+                (if (= 0 (count maps))
+                  s
+                  (recur (seed-remap s (first maps)) (rest maps))))) seeds)
+       (apply min)))
+
+(identity seeds2)
+
+(count seeds2)
+
+(range 2 10)
+(apply range '(2 10))
+
+(part-2 seeds2 maps)
